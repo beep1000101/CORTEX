@@ -21,7 +21,7 @@ from openai.types.beta.threads.runs.code_interpreter_tool_call import (
 )
 
 # Set page config
-st.set_page_config(page_title="DAVE",
+st.set_page_config(page_title="CORTEX",
                    layout='wide')
 
 # Get secrets
