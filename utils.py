@@ -13,7 +13,7 @@ import streamlit as st
 from openai import (
     OpenAI,
     AssistantEventHandler
-    )
+)
 from openai.types.beta.threads import Text, TextDelta
 from openai.types.beta.threads.runs import ToolCall, ToolCallDelta
 
@@ -25,6 +25,7 @@ LAST_UPDATE_DATE = "2024-04-08"
 
 # Initialise the OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
+
 
 def render_custom_css() -> None:
     """
@@ -44,6 +45,7 @@ def render_custom_css() -> None:
             </style>
             """)
 
+
 def initialise_session_state():
     """
     Initialise session state variables
@@ -62,6 +64,7 @@ def initialise_session_state():
         if session_state_var not in st.session_state:
             st.session_state[session_state_var] = []
 
+
 def moderation_endpoint(text) -> bool:
     """
     Checks if the text is triggers the moderation endpoint
@@ -74,6 +77,7 @@ def moderation_endpoint(text) -> bool:
     """
     response = client.moderations.create(input=text)
     return response.results[0].flagged
+
 
 def is_nsfw(text) -> bool:
     """
@@ -98,6 +102,7 @@ def is_nsfw(text) -> bool:
     output = response.choices[0].message.content
     return bool(output)
 
+
 def is_not_question(text) -> bool:
     """
     Checks if the text is not a question
@@ -121,10 +126,11 @@ def is_not_question(text) -> bool:
     output = response.choices[0].message.content
     return bool(output)
 
+
 def delete_files(file_id_list: list[str]) -> None:
     """
     Delete the file(s) uploaded
-    
+
     Args:
     - file_id_list (list[str]): List of file ids to delete
     """
@@ -132,15 +138,17 @@ def delete_files(file_id_list: list[str]) -> None:
         client.files.delete(file_id)
         print(f"Deleted file: \t {file_id}")
 
+
 def delete_thread(thread_id) -> None:
     """
     Delete the thread
-    
+
     Args:
     - thread_id (str): The id of the thread to delete
     """
     client.beta.threads.delete(thread_id)
     print(f"Deleted thread: \t {thread_id}")
+
 
 def remove_links(text: str) -> str:
     """
@@ -163,6 +171,7 @@ def remove_links(text: str) -> str:
     cleaned_text = re.sub(combined_pattern, '', text, flags=re.MULTILINE)
     return cleaned_text
 
+
 def retrieve_messages_from_thread(thread_id: str) -> list[str]:
     """
     Retrieve messages from the thread
@@ -179,6 +188,7 @@ def retrieve_messages_from_thread(thread_id: str) -> list[str]:
         if message.role == "assistant":
             assistant_messages.append(message.id)
     return assistant_messages
+
 
 def retrieve_assistant_created_files(message_list: list[str]) -> list[str]:
     """
@@ -200,7 +210,7 @@ def retrieve_assistant_created_files(message_list: list[str]) -> list[str]:
         # Retrieve the attachments from the message, and the file ids from the attachments
         created_file_id = [file.file_id for file in message.attachments]
         for file_id in created_file_id:
-            assistant_created_file_ids.append(file_id)        
+            assistant_created_file_ids.append(file_id)
 
         # message_files = client.beta.threads.messages.files.list(
         #     thread_id=st.session_state.thread_id,
@@ -209,6 +219,7 @@ def retrieve_assistant_created_files(message_list: list[str]) -> list[str]:
         #     assistant_created_file_ids.append(file.id)
 
     return assistant_created_file_ids
+
 
 @st.experimental_fragment
 def render_download_files(file_id_list: list[str]) -> Tuple[list[bytes], list[str]]:
@@ -227,7 +238,7 @@ def render_download_files(file_id_list: list[str]) -> Tuple[list[bytes], list[st
     if len(file_id_list) > 0:
         st.markdown("### 📂  **Downloadable Files**")
         for file_id_num, file_id in enumerate(file_id_list):
-            try: 
+            try:
                 file_data = client.files.content(file_id)
                 file = file_data.read()
                 file_name = client.files.retrieve(file_id).filename
@@ -241,7 +252,7 @@ def render_download_files(file_id_list: list[str]) -> Tuple[list[bytes], list[st
                 #     except:
                 #         # Convert bytes to string
                 #         csv_str = file.decode('utf-8')
-                #         csv_file = io.StringIO(csv_str)            
+                #         csv_file = io.StringIO(csv_str)
                 #         df = pd.read_csv(csv_file)
                 #         df.to_csv(f"static/{file_name}", index=False)
                 # elif file_name.endswith(".png"):
@@ -255,21 +266,21 @@ def render_download_files(file_id_list: list[str]) -> Tuple[list[bytes], list[st
 
                 # Display the download button
                 st.download_button(label=f"{file_name}",
-                                    data=file,
-                                    file_name=file_name,
-                                    mime="text/csv")
-                                    
-            except: 
+                                   data=file,
+                                   file_name=file_name,
+                                   mime="text/csv")
+
+            except:
                 # Display the download button
                 file = st.session_state.download_files[file_id_num]
                 file_name = st.session_state.download_file_names[file_id_num]
                 st.download_button(label=f"{file_name}",
-                                    data=file,
-                                    file_name=file_name,
-                                    mime="text/csv")
-    
+                                   data=file,
+                                   file_name=file_name,
+                                   mime="text/csv")
+
     return downloaded_files, file_names
-    
+
 
 class EventHandler(AssistantEventHandler):
     """
@@ -285,19 +296,22 @@ class EventHandler(AssistantEventHandler):
         # Note how `on_tool_call_done` creates a new textbook (which is the x_th textbox, so we want to access the x-1_th)
         # This is to address an edge case where code is executed, but there is no output textbox (e.g. a graph is created)
         try:
-            st.session_state[f"code_expander_{len(st.session_state.text_boxes) - 1}"].update(state="complete", expanded=False)
+            st.session_state[f"code_expander_{len(st.session_state.text_boxes) - 1}"].update(
+                state="complete", expanded=False)
         except KeyError:
             pass
 
         # Create a new text box
         st.session_state.text_boxes.append(st.empty())
         # Insert the text into the last element in assistant text list
-        st.session_state.assistant_text[-1] += "**> 🕵️ DAVE:** \n\n "
+        st.session_state.assistant_text[-1] += "**> 🤖 CORTEX:** \n\n "
         # Remove links from the text
-        st.session_state.assistant_text[-1] = remove_links(st.session_state.assistant_text[-1])
+        st.session_state.assistant_text[-1] = remove_links(
+            st.session_state.assistant_text[-1])
         # Display the text in the newly created text box
-        st.session_state.text_boxes[-1].info("".join(st.session_state["assistant_text"][-1]))
-      
+        st.session_state.text_boxes[-1].info(
+            "".join(st.session_state["assistant_text"][-1]))
+
     @override
     def on_text_delta(self, delta: TextDelta, snapshot: Text):
         """
@@ -309,9 +323,11 @@ class EventHandler(AssistantEventHandler):
         if delta.value:
             st.session_state.assistant_text[-1] += delta.value
         # Remove links from the text
-        st.session_state.assistant_text[-1] = remove_links(st.session_state.assistant_text[-1])
+        st.session_state.assistant_text[-1] = remove_links(
+            st.session_state.assistant_text[-1])
         # Re-display the full text in the latest text box
-        st.session_state.text_boxes[-1].info("".join(st.session_state["assistant_text"][-1]))
+        st.session_state.text_boxes[-1].info(
+            "".join(st.session_state["assistant_text"][-1]))
 
     def on_text_done(self, text: Text):
         """
@@ -329,7 +345,7 @@ class EventHandler(AssistantEventHandler):
         st.session_state.text_boxes.append(st.empty())
         # Create a new element in the code input list
         st.session_state.code_input.append("")
-          
+
     def on_tool_call_delta(self, delta: ToolCallDelta, snapshot: ToolCallDelta):
         """
         Handler for when a tool call delta is created
@@ -343,17 +359,21 @@ class EventHandler(AssistantEventHandler):
                     # Check if a code box for this accompanying text box index exists
                     if f"code_box_{len(st.session_state.text_boxes)}" not in st.session_state:
                         # Nest the code in an expander
-                        st.session_state[f"code_expander_{len(st.session_state.text_boxes)}"] = st.status("**💻 Code**", expanded=True)
+                        st.session_state[f"code_expander_{len(st.session_state.text_boxes)}"] = st.status(
+                            "**💻 Code**", expanded=True)
                         # Create an empty container which is the placeholder for the code box
-                        st.session_state[f"code_box_{len(st.session_state.text_boxes)}"] = st.session_state[f"code_expander_{len(st.session_state.text_boxes)}"].empty()
+                        st.session_state[f"code_box_{len(st.session_state.text_boxes)}"] = st.session_state[
+                            f"code_expander_{len(st.session_state.text_boxes)}"].empty()
 
                 # Clear the code box
-                st.session_state[f"code_box_{len(st.session_state.text_boxes)}"].empty()
+                st.session_state[f"code_box_{len(st.session_state.text_boxes)}"].empty(
+                )
                 # If there is code written, add it to the code input
                 if delta.code_interpreter.input:
                     st.session_state.code_input[-1] += delta.code_interpreter.input
                 # Re-display the full code in the code box
-                st.session_state[f"code_box_{len(st.session_state.text_boxes)}"].code(st.session_state.code_input[-1])
+                st.session_state[f"code_box_{len(st.session_state.text_boxes)}"].code(
+                    st.session_state.code_input[-1])
 
             # Output from the code executed by code interpreter
             if delta.code_interpreter.outputs:
@@ -362,7 +382,8 @@ class EventHandler(AssistantEventHandler):
                         # This try-except block will update the earlier expander for code to complete.
                         # Note the indexing, as we have not yet created a new text box for the code output.
                         try:
-                            st.session_state[f"code_expander_{len(st.session_state.text_boxes)}"].update(state="complete", expanded=False)
+                            st.session_state[f"code_expander_{len(st.session_state.text_boxes)}"].update(
+                                state="complete", expanded=False)
                         except KeyError:
                             pass
                         # Create a new element in the code input list, which is for the next code input
@@ -370,7 +391,8 @@ class EventHandler(AssistantEventHandler):
                         # Create a new text box, which is for the code output
                         st.session_state.text_boxes.append(st.empty())
                         # Nest the code output in an expander
-                        st.session_state.text_boxes[-1] = st.expander(label="**🔎 Output**")
+                        st.session_state.text_boxes[-1] = st.expander(
+                            label="**🔎 Output**")
                         # Create a new element in the code output list
                         st.session_state.code_output.append("")
                         # Clear the latest text box which is for the code output
@@ -378,7 +400,8 @@ class EventHandler(AssistantEventHandler):
                         # Add the logs to the code output
                         st.session_state.code_output[-1] += f"\n\n{output.logs}"
                         # Display the code output
-                        st.session_state.text_boxes[-1].code(st.session_state.code_output[-1])
+                        st.session_state.text_boxes[-1].code(
+                            st.session_state.code_output[-1])
 
     def on_tool_call_done(self, tool_call: ToolCall):
         """
@@ -415,7 +438,7 @@ class EventHandler(AssistantEventHandler):
         # Create new text box
         st.session_state.text_boxes.append(st.empty())
         st.session_state.assistant_text.append("")
-        
+
         # # Display image in textbox
         image_html = f'<p align="center"><img src="data:image/png;base64,{data_url}" width=600></p>'
         st.session_state.text_boxes[-1].html(image_html)
@@ -425,10 +448,10 @@ class EventHandler(AssistantEventHandler):
         # Create new text box
         st.session_state.assistant_text.append("")
         st.session_state.text_boxes.append(st.empty())
-        
+
         # Delete file from OpenAI
         client.files.delete(image_file.file_id)
-      
+
     def on_timeout(self):
         """
         Handler for when the api call times out

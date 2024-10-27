@@ -10,6 +10,9 @@
 # env
 cortex/
 
+# data
+data/
+
 # User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
