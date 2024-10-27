@@ -16,11 +16,12 @@ from utils import (
     render_download_files,
     retrieve_messages_from_thread,
     retrieve_assistant_created_files
-    )
+)
 
 # Get secrets
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", st.secrets["OPENAI_API_KEY"])
-ASSISTANT_ID = os.environ.get("OPENAI_ASSISTANT_ID", st.secrets["OPENAI_ASSISTANT_ID"])
+ASSISTANT_ID = os.environ.get(
+    "OPENAI_ASSISTANT_ID", st.secrets["OPENAI_ASSISTANT_ID"])
 
 # Initialise the OpenAI client, and retrieve the assistant
 client = OpenAI(api_key=OPENAI_API_KEY)
@@ -36,7 +37,7 @@ render_custom_css()
 initialise_session_state()
 
 # UI
-st.subheader("🔮 DAVE: Data Analysis & Visualisation Engine")
+st.subheader("CORTEX")
 file_upload_box = st.empty()
 upload_btn = st.empty()
 text_box = st.empty()
@@ -71,7 +72,7 @@ if not st.session_state["file_uploaded"]:
         st.rerun()
 
 if st.session_state["file_uploaded"]:
-    
+
     question = text_box.text_area("Ask a question")
 
     # If the button is clicked
@@ -84,11 +85,12 @@ if st.session_state["file_uploaded"]:
         # Check if the question is flagged
         if moderation_endpoint(question):
             # if flagged, return a warning message, delete the files and stop the app
-            st.warning("Your question has been flagged. Refresh page to try again.")
+            st.warning(
+                "Your question has been flagged. Refresh page to try again.")
             delete_files(st.session_state.file_id)
             st.stop()
 
-        # If there is no text boxes in the session state, create an empty list 
+        # If there is no text boxes in the session state, create an empty list
         # This list will store the text boxes created by the Assistant
         if "text_boxes" not in st.session_state:
             st.session_state.text_boxes = []
@@ -102,8 +104,9 @@ if st.session_state["file_uploaded"]:
         # Update the thread to attach the file(s)
         client.beta.threads.update(
             thread_id=st.session_state.thread_id,
-            tool_resources={"code_interpreter": {"file_ids": [file_id for file_id in st.session_state.file_id]}}
-            )
+            tool_resources={"code_interpreter": {"file_ids": [
+                file_id for file_id in st.session_state.file_id]}}
+        )
 
         # Ask the question
         client.beta.threads.messages.create(
@@ -119,20 +122,24 @@ if st.session_state["file_uploaded"]:
         # Run the Assistant and the EventHandler handles the stream
         with client.beta.threads.runs.stream(thread_id=st.session_state.thread_id,
                                              assistant_id=assistant.id,
-                                             tool_choice={"type": "code_interpreter"},
+                                             tool_choice={
+                                                 "type": "code_interpreter"},
                                              event_handler=EventHandler(),
                                              temperature=0) as stream:
             stream.until_done()
-            st.toast("DAVE has finished analysing the data", icon="🕵️")
+            st.toast("CORTEX has finished analysing the data", icon="🕵️")
 
         # Prepare the files for download
         with st.spinner("Preparing the files for download..."):
             # Retrieve the messages by the Assistant from the thread
-            assistant_messages = retrieve_messages_from_thread(st.session_state.thread_id)
+            assistant_messages = retrieve_messages_from_thread(
+                st.session_state.thread_id)
             # For each assistant message, retrieve the file(s) created by the Assistant
-            st.session_state.assistant_created_file_ids = retrieve_assistant_created_files(assistant_messages)
+            st.session_state.assistant_created_file_ids = retrieve_assistant_created_files(
+                assistant_messages)
             # Download these files
-            st.session_state.download_files, st.session_state.download_file_names = render_download_files(st.session_state.assistant_created_file_ids)
+            st.session_state.download_files, st.session_state.download_file_names = render_download_files(
+                st.session_state.assistant_created_file_ids)
 
         # Clean-up
         # Delete the file(s) uploaded

@@ -99,7 +99,7 @@ if qn_btn.button("Ask CORTEX"):
                                          event_handler=EventHandler(),
                                          temperature=0) as stream:
         stream.until_done()
-        st.toast("CORTEX has finished analysing the data", icon="🕵️")
+        st.toast("CORTEX has finished analysing the data", icon="🤖")
 
     # Prepare the files for download
     with st.spinner("Preparing the files for download..."):
