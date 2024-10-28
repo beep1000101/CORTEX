@@ -2,6 +2,8 @@
 demo_app.py
 """
 import os
+import time
+from random import randrange
 import streamlit as st
 from openai import OpenAI
 from utils import (
@@ -46,8 +48,13 @@ if "disabled" not in st.session_state:
 # UI
 partner_name = os.getenv(
     "PARTNER_NAME", st.secrets["PARTNER_NAME"])
-st.subheader("🤖 CORTEX: Prototyp asystenta OptiGastro")
+st.subheader("🤖 CORTEX: Prototyp asystenta OptiGastroAI")
 st.markdown(f"Powered by the knowledge base created by {partner_name}.")
+
+with st.spinner("CORTEX Neural Net calibration..."):
+    time.sleep(randrange(100, 750)/250)
+
+
 text_box = st.empty()
 qn_btn = st.empty()
 
