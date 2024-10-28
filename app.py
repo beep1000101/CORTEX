@@ -21,14 +21,14 @@ from utils import (
 # Get secrets
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", st.secrets["OPENAI_API_KEY"])
 ASSISTANT_ID = os.environ.get(
-    "OPENAI_ASSISTANT_ID", st.secrets["OPENAI_ASSISTANT_ID"])
+    "ASSISTANT_ID", st.secrets["ASSISTANT_ID"])
 
 # Initialise the OpenAI client, and retrieve the assistant
 client = OpenAI(api_key=OPENAI_API_KEY)
 assistant = client.beta.assistants.retrieve(ASSISTANT_ID)
 
-st.set_page_config(page_title="DAVE",
-                   page_icon="🕵️")
+st.set_page_config(page_title="CORTEX",
+                   page_icon="🤖")
 
 # Apply custom CSS
 render_custom_css()
@@ -37,11 +37,13 @@ render_custom_css()
 initialise_session_state()
 
 # UI
-st.subheader("CORTEX")
-file_upload_box = st.empty()
-upload_btn = st.empty()
+partner_name = os.getenv(
+    "PARTNER_NAME", st.secrets["PARTNER_NAME"])
+st.subheader("🤖 CORTEX: Prototyp asystenta OptiGastro")
+st.markdown(f"Powered by the knowledge base created by {partner_name}.")
 text_box = st.empty()
 qn_btn = st.empty()
+
 
 # File Upload
 if not st.session_state["file_uploaded"]:
@@ -76,7 +78,7 @@ if st.session_state["file_uploaded"]:
     question = text_box.text_area("Ask a question")
 
     # If the button is clicked
-    if qn_btn.button("Ask DAVE"):
+    if qn_btn.button("Ask CORTEX"):
 
         # Clear the UI
         text_box.empty()
@@ -127,7 +129,7 @@ if st.session_state["file_uploaded"]:
                                              event_handler=EventHandler(),
                                              temperature=0) as stream:
             stream.until_done()
-            st.toast("CORTEX has finished analysing the data", icon="🕵️")
+            st.toast("CORTEX has finished analysing the data", icon="🤖")
 
         # Prepare the files for download
         with st.spinner("Preparing the files for download..."):
