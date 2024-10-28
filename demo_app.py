@@ -53,6 +53,8 @@ qn_btn = st.empty()
 
 question = text_box.text_area(
     "Ask a question", disabled=st.session_state.disabled)
+
+
 if qn_btn.button("Ask CORTEX"):
 
     text_box.empty()
@@ -62,23 +64,11 @@ if qn_btn.button("Ask CORTEX"):
         st.warning("Your question has been flagged. Refresh page to try again.")
         st.stop()
 
-    # if is_not_question(question):
-    #     st.warning("Please ask a question. Refresh page to try again.")
-    #     client.beta.threads.delete(st.session_state.thread_id)
-    #     st.stop()
-
     # Create a new thread
     if "thread_id" not in st.session_state:
         thread = client.beta.threads.create()
         st.session_state.thread_id = thread.id
         print(st.session_state.thread_id)
-
-    # Update the thread to attach the file
-    # client.beta.threads.update(
-    #     thread_id=st.session_state.thread_id,
-    #     tool_resources={"code_interpreter": {
-    #         "file_ids": [st.secrets["FILE_ID"]]}}
-    # )
 
     if "text_boxes" not in st.session_state:
         st.session_state.text_boxes = []
@@ -102,7 +92,7 @@ if qn_btn.button("Ask CORTEX"):
         st.toast("CORTEX has finished analysing the data", icon="🤖")
 
     # Prepare the files for download
-    with st.spinner("Preparing the files for download..."):
+    with st.spinner("Information sythesis is in progress..."):
         # Retrieve the messages by the Assistant from the thread
         assistant_messages = retrieve_messages_from_thread(
             st.session_state.thread_id)
@@ -115,6 +105,8 @@ if qn_btn.button("Ask CORTEX"):
 
     # Clean-up
     # Delete the file(s) created by the Assistant
-    delete_files(st.session_state.assistant_created_file_ids)
-    # Delete the thread
-    delete_thread(st.session_state.thread_id)
+    if st.button("🤖 Restart CORTEX to ask another question."):
+        delete_files(st.session_state.assistant_created_file_ids)
+        # Delete the thread
+        delete_thread(st.session_state.thread_id)
+        st.rerun()
