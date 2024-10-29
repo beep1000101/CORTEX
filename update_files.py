@@ -21,7 +21,7 @@ vector_store = client.beta.vector_stores.create(
 )
 
 file_paths = [file for file in data_path.iterdir(
-) if file.suffix == ".txt" and file.stem]
+) if file.suffix == ".txt"]
 file_streams = [file.open("rb") for file in file_paths]
 
 file_batch = client.beta.vector_stores.file_batches.upload_and_poll(

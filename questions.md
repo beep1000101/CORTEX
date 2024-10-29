@@ -20,3 +20,14 @@
 2. Jakie ograniczenia i zasady dotyczące sprzedaży alkoholu muszę uwzględnić, prowadząc lokal gastronomiczny?
 3. Jakie obowiązki mam jako restaurator względem edukacji klientów w zakresie odpowiedzialnego spożywania alkoholu?
 4. Jakie sankcje przewiduje ustawa za naruszenie przepisów dotyczących sprzedaży alkoholu w restauracji?
+
+## Ustawa z dnia 25 sierpnia 2006 r. o bezpieczeństwie żywności i żywienia
+
+1. Jakie konkretne wymogi dotyczące systemu HACCP muszę wdrożyć w mojej restauracji, aby zapewnić bezpieczeństwo żywności?
+2. Jakie przepisy ustawa przewiduje w zakresie przechowywania surowców i gotowych potraw, aby zapobiec ich zanieczyszczeniu?
+3. Jakie są obowiązki informacyjne względem klientów w kwestii alergenów zawartych w potrawach?
+4. Jakie kary mogą zostać nałożone na lokal gastronomiczny za naruszenie zasad bezpieczeństwa żywności określonych w ustawie?
+
+## Ogólne
+
+1. W jakich sytuacjach mogę wymagać od moich pracowników, aby zostali dłużej w pracy?
